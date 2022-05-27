@@ -1,3 +1,1 @@
-# nested_nav_app
-
-Nested navigation demo
+**Nested navigation demo**
