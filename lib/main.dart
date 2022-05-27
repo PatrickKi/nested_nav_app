@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -34,15 +36,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
   final _navigatorKey = GlobalKey<NavigatorState>();
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  Color? randomColor;
 
   @override
   Widget build(BuildContext context) {
@@ -71,20 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     )),
               ),
             ),
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
@@ -104,6 +87,14 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         onBack: () {
           _navigatorKey.currentState!.pop(true);
+        },
+        randomColor: randomColor,
+        onRandomColor: () {
+          setState(() {
+            var rand = Random();
+            randomColor = Color.fromARGB(
+                255, rand.nextInt(100) + 100, rand.nextInt(100) + 100, rand.nextInt(100) + 100);
+          });
         },
       );
     } else if (routeSettings.name == routeThirdPage) {
@@ -170,10 +161,18 @@ class _FirstPageState extends State<FirstPage> {
 }
 
 class SecondPage extends StatefulWidget {
-  const SecondPage({Key? key, this.onNext, this.onBack}) : super(key: key);
+  const SecondPage({
+    Key? key,
+    this.onNext,
+    this.onBack,
+    this.onRandomColor,
+    this.randomColor,
+  }) : super(key: key);
 
   final void Function()? onNext;
   final void Function()? onBack;
+  final void Function()? onRandomColor;
+  final Color? randomColor;
 
   @override
   _SecondPageState createState() => _SecondPageState();
@@ -187,7 +186,7 @@ class _SecondPageState extends State<SecondPage> {
       children: [
         Flexible(
             child: Container(
-          color: Colors.red[400],
+          color: widget.randomColor,
           child: Center(
               child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             ElevatedButton(
@@ -197,6 +196,10 @@ class _SecondPageState extends State<SecondPage> {
             ElevatedButton(
               onPressed: widget.onBack,
               child: const Text("Navigate back"),
+            ),
+            ElevatedButton(
+              onPressed: widget.onRandomColor,
+              child: const Text("Change to random color"),
             ),
           ])),
         ))
