@@ -36,6 +36,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final ValueNotifier<Color?> _colorNotifier = ValueNotifier<Color?>(null);
   final _navigatorKey = GlobalKey<NavigatorState>();
   Color? randomColor;
 
@@ -88,13 +89,14 @@ class _MyHomePageState extends State<MyHomePage> {
         onBack: () {
           _navigatorKey.currentState!.pop(true);
         },
-        randomColor: randomColor,
+        randomColorNotifier: _colorNotifier,
         onRandomColor: () {
-          setState(() {
-            var rand = Random();
-            randomColor = Color.fromARGB(
-                255, rand.nextInt(100) + 100, rand.nextInt(100) + 100, rand.nextInt(100) + 100);
-          });
+          // setState(() {
+          var rand = Random();
+          randomColor = Color.fromARGB(
+              255, rand.nextInt(100) + 100, rand.nextInt(100) + 100, rand.nextInt(100) + 100);
+          _colorNotifier.value = randomColor;
+          // });
         },
       );
     } else if (routeSettings.name == routeThirdPage) {
@@ -166,13 +168,13 @@ class SecondPage extends StatefulWidget {
     this.onNext,
     this.onBack,
     this.onRandomColor,
-    this.randomColor,
+    required this.randomColorNotifier,
   }) : super(key: key);
 
   final void Function()? onNext;
   final void Function()? onBack;
   final void Function()? onRandomColor;
-  final Color? randomColor;
+  final ValueNotifier<Color?> randomColorNotifier;
 
   @override
   _SecondPageState createState() => _SecondPageState();
@@ -185,23 +187,28 @@ class _SecondPageState extends State<SecondPage> {
       direction: Axis.vertical,
       children: [
         Flexible(
-            child: Container(
-          color: widget.randomColor,
-          child: Center(
-              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            ElevatedButton(
-              onPressed: widget.onNext,
-              child: const Text("Navigate to third page"),
-            ),
-            ElevatedButton(
-              onPressed: widget.onBack,
-              child: const Text("Navigate back"),
-            ),
-            ElevatedButton(
-              onPressed: widget.onRandomColor,
-              child: const Text("Change to random color"),
-            ),
-          ])),
+            child: ValueListenableBuilder<Color?>(
+          valueListenable: widget.randomColorNotifier,
+          builder: (context, color, child) {
+            return Container(
+              color: color,
+              child: Center(
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                ElevatedButton(
+                  onPressed: widget.onNext,
+                  child: const Text("Navigate to third page"),
+                ),
+                ElevatedButton(
+                  onPressed: widget.onBack,
+                  child: const Text("Navigate back"),
+                ),
+                ElevatedButton(
+                  onPressed: widget.onRandomColor,
+                  child: const Text("Change to random color"),
+                ),
+              ])),
+            );
+          },
         ))
       ],
     );
